@@ -1,3 +1,6 @@
 #!/usr/bin/python
 
-print("hello world!")
+import datasets
+
+datasets.download()
+datasets.plot(3)

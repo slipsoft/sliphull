@@ -1,6 +1,11 @@
 # dependencies
-env
+env/
 
-# IDEs
+# IDE files
 .vscode
 
+# python files
+__pycache__
+
+# other generated files
+samples/
