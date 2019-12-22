@@ -12,7 +12,7 @@ class Area(object):
     def getXs(self) -> np.array:
         return self.points[:, 0]
 
-    def getXs(self) -> np.array:
+    def getYs(self) -> np.array:
         return self.points[:, 1]
 
 
@@ -43,6 +43,11 @@ class Algorithm(ABC):
 
 class AklToussaint(Algorithm):
     def execute(self, points: DataFrame) -> Area:
+        # exemple iteration
+        for idx, x, y in points.itertuples():
+            # print(x)
+            # print(y)
+            pass
         return Area()
 
 
