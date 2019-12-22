@@ -19,6 +19,7 @@ def download() -> bool:
 
     """
     if os.path.isdir('samples') and len(all_files()) > 0:
+        _clean_files()
         return False
     url = 'http://www-apr.lip6.fr/~buixuan/files/algav2019/Varoumas_benchmark.zip'
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -26,16 +27,27 @@ def download() -> bool:
     with zipfile.ZipFile(filename, 'r') as zip_ref:
         zip_ref.extractall()
     os.unlink(filename)
+    _clean_files()
     return True
+
+def _clean_files() -> None:
+    """Well ok it's quite dirty, but the first file is corrupted
+    and it is easier to start counting from 0.
+    """
+    try:
+        os.rename('samples/test-1664.points', 'samples/test-0.points')
+        os.rename('samples/test-1663.points', 'samples/test-1.points')
+    except FileNotFoundError:
+        pass
 
 
 def all_files() -> List[str]:
-    """Get all dataset files."""
+    """Get all dataset file names."""
     return glob('samples/*')
 
 
 def get_from_file(file) -> pd.DataFrame:
-    """Get a dataframe from a dataset file"""
+    """Get a dataframe from a dataset file name."""
     return pd.read_csv(file, sep=' ', names=['x', 'y'])
 
 
@@ -87,12 +99,12 @@ def benchmark(algos: List[Algorithm]) -> Dict:
         'result': [],
         'duration': []
     })
-    for key, file in enumerate(all_files()[1:]):
+    for index, file in enumerate(all_files()):
         points = get_from_file(file)
         for algo in algos:
             start = time()
             result = algo.execute(points)
             duration = time() - start
-            results[algo.__class__.__name__]['result'].append(result)
-            results[algo.__class__.__name__]['duration'].append(duration)
+            results[algo.name]['result'].append(result)
+            results[algo.name]['duration'].append(duration)
     return results

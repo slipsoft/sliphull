@@ -6,7 +6,8 @@ from algorithms import AklToussaint, Ritter
 datasets.download()
 
 algos = [
-    AklToussaint()
+    AklToussaint(),
+    # Ritter()
 ]
 print(datasets.benchmark(algos))
 
