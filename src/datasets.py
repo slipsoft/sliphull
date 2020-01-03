@@ -11,7 +11,7 @@ from collections import defaultdict
 from typing import List, Dict
 
 #: Index of the last file after cleaning
-LAST_FILE = 1662
+NB_FILES = 1663
 
 def download() -> bool:
     """Download the dataset from internet if it doesn't exist.
@@ -37,8 +37,8 @@ def _clean_files() -> None:
     and it is easier to start counting from 0.
     """
     try:
-        os.rename('samples/test-%s.points' % (LAST_FILE + 2), 'samples/test-0.points')
-        os.rename('samples/test-%s.points' % (LAST_FILE + 1), 'samples/test-1.points')
+        os.rename('samples/test-%s.points' % (NB_FILES + 1), 'samples/test-0.points')
+        os.rename('samples/test-%s.points' % (NB_FILES), 'samples/test-1.points')
     except FileNotFoundError:
         pass
 
@@ -67,7 +67,7 @@ def get(num: int) -> pd.DataFrame:
     return get_from_file(file)
 
 
-def plot(num: int) -> None:
+def plot(num: int, areas = []) -> None:
     """Plot one of the datasets.
 
     Args:
@@ -77,17 +77,20 @@ def plot(num: int) -> None:
     points = get(num)
     print(points)
 
+    for area in areas:
+        area.plot(plt)
+
     # plot the points as lines
-    plt.plot(points['x'], points['y'], 'C3', zorder=1)
+    plt.plot(points['x'], points['y'], 'r')
 
     # plot the points as dots
-    plt.scatter(points['x'], points['y'], zorder=2)
+    plt.scatter(points['x'], points['y'], marker='+', zorder=3)
 
-    plt.axis('off')
+    plt.axis('equal')
     plt.show()
 
 
-def benchmark(algos: List[Algorithm], start = 0, length = LAST_FILE) -> Dict:
+def benchmark(algos: List[Algorithm], begin = 0, end = NB_FILES) -> Dict:
     """Make a benchmark of the given algorithms.
 
     Args:
@@ -101,7 +104,7 @@ def benchmark(algos: List[Algorithm], start = 0, length = LAST_FILE) -> Dict:
         'result': [],
         'duration': []
     })
-    for file in all_files()[start:length]:
+    for file in all_files()[begin:end]:
         points = get_from_file(file)
         for algo in algos:
             start = time()

@@ -6,9 +6,9 @@ from algorithms import AklToussaint, Ritter
 datasets.download()
 
 algos = [
-    AklToussaint(),
-    # Ritter()
+    # AklToussaint(),
+    Ritter()
 ]
-print(datasets.benchmark(algos, 10, 15))
+bench = datasets.benchmark(algos, 0, 5)
 
-datasets.plot(3)
+datasets.plot(1, [bench['Ritter']['result'][1]])

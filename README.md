@@ -2,6 +2,9 @@
 
 Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 
+**Minimal circle approximation**
+![minimal circle approximation](docs/minimal-circle-approx.png)
+
 ## Getting started
 
 ### Activate environment
