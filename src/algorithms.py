@@ -18,6 +18,32 @@ def middle(point1, point2):
     return Point((point1.x + point2.x) / 2, (point1.y + point2.y) / 2)
 
 
+def in_ABC(P, A, B, C):
+    """Test if P is inside the triangle ABC.
+
+    Not tested yet
+    
+    Args:
+        P (Point): The point to test
+        A (Point): Point A of the triangle
+        B (Point): Point B of the triangle
+        C (Point): Point C of the triangle
+    
+    Returns:
+        bool: True if it is inside or else False
+    """
+    l1 = ((B.y - C.y) * (P.x - C.x) + (C.x - B.x) * (P.y - C.y)) / \
+        ((B.y - C.y) * (A.x - C.x) + (C.x - B.x) * (A.y - C.y))
+    if l1 > 1 or l1 < 0:
+        return False
+    l2 = ((C.y - A.y) * (P.x - C.x) + (A.x - C.x) * (P.y - C.y)) / \
+        ((B.y - C.y) * (A.x - C.x) + (C.x - B.x) * (A.y - C.y))
+    if l2 > 1 or l2 < 0:
+        return False
+    l3 = 1 - l1 - l2
+    return l3 <= 1 and l1 >= 0
+
+
 class Point(object):
     def __init__(self, x, y):
         super().__init__()
@@ -40,11 +66,10 @@ class Area(ABC):
 
 
 class Circle(Area):
-    def __init__(self, center: Point, sq_radius):
+    def __init__(self, center: Point, radius):
         super().__init__()
         self.center = center
-        self.sq_radius = sq_radius
-        self.radius = sqrt(sq_radius)
+        self.radius = radius
 
     def plot(self, plt: plt):
         circle = plt.Circle(self.center.coords(),
@@ -90,7 +115,7 @@ class AklToussaint(Algorithm):
 
 class Ritter(Algorithm):
     def execute(self, points: DataFrame) -> Area:
-        """Not finished but it's only the first implementation."""
+        """Ritter's bounding circle algorithm."""
         dummy = points.iloc[0]
         prev_dist = 0
         for idx, point in points.iterrows():
@@ -119,4 +144,4 @@ class Ritter(Algorithm):
                 factor = r / dist
                 c = Point(p.x - dx * factor, p.y - dy * factor)
                 rsq = r * r
-        return Circle(c, rsq)
+        return Circle(c, r)

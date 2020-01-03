@@ -5,7 +5,7 @@ Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 | Algorithm                    | Hull                                                            |
 |------------------------------|-----------------------------------------------------------------|
 | Minimal circle approximation | ![minimal circle approximation](docs/minimal-circle-approx.png) |
-| Minimal circle Ritter        | ![minimal circle ritter](docs/minimal-circle-ritter.png)        |
+| Ritter's bounding circle     | ![bounding circle ritter](docs/bounding-circle-ritter.png)       |
 
 ## Getting started
 
