@@ -20,7 +20,7 @@ Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 
 #### Debian and derivatives
 
-    sudo apt install python3 python python-pip
+    sudo apt install python3 python python-pip python3-tk
 
 ### Activate environment
 
@@ -54,4 +54,4 @@ Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 
 ### Deactivate environment
 
-    source deactivate.sh
+    deactivate
