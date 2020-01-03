@@ -13,6 +13,15 @@ Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 
 ## Getting started
 
+### Requirements
+
+- Python >=3.6
+- pip
+
+#### Debian and derivatives
+
+    sudo apt install python3 python python-pip
+
 ### Activate environment
 
     source activate.sh

@@ -42,7 +42,7 @@ def _clean_files() -> None:
     try:
         os.rename('samples/test-%s.points' %
                   (NB_FILES + 1), 'samples/test-0.points')
-        os.rename('samples/test-%s.points' %
+        os.replace('samples/test-%s.points' %
                   (NB_FILES), 'samples/test-1.points')
     except FileNotFoundError:
         pass
