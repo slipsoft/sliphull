@@ -81,6 +81,7 @@ def plot(num: int, areas=[]) -> plt:
     """
     points = get(num)
 
+    plt.figure()
     patches = []
     for area in areas:
         color = rand(3,)
@@ -92,7 +93,7 @@ def plot(num: int, areas=[]) -> plt:
     #plt.plot(points.x_col(), points.y_col(), 'r')
 
     # plot the points as dots
-    plt.scatter(points.x_col(), points.y_col(), marker='+', zorder=3)
+    points.plot(plt)
 
     plt.axis('equal')
     return plt

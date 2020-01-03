@@ -67,6 +67,11 @@ class PointSet(list):
     def y_col(self):
         return [p.y for p in self]
 
+    def plot(self, plt, color='b'):
+        # plot the points as dots
+        plt.scatter(self.x_col(), self.y_col(),
+                    marker='+', zorder=3, color=color)
+
 
 def akl_toussaint(points: PointSet):
     top = points[0]
@@ -237,5 +242,14 @@ class Ritter(Algorithm):
 class RitterAklToussaint(Ritter):
     def execute(self, points: PointSet) -> Area:
         points, area = akl_toussaint(points)
-        # return area
         return super().execute(points)
+
+
+class AklToussaint(Algorithm):
+    def execute(self, points: PointSet) -> Area:
+        plt.figure()
+        points.plot(plt)
+        points, area = akl_toussaint(points)
+        points.plot(plt, 'r')
+        area.plot(plt)
+        return area
