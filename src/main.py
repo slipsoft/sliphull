@@ -1,14 +1,18 @@
 #!/usr/bin/python
 
 import datasets
-from algorithms import AklToussaint, Ritter
+from algorithms import RitterAklToussaint, Ritter
 
 datasets.download()
 
 algos = [
-    # AklToussaint(),
+    RitterAklToussaint(),
     Ritter()
 ]
 bench = datasets.benchmark(algos, 0, 5)
+print(bench)
 
-datasets.plot(1, [bench['Ritter']['result'][1]])
+datasets.plot(1, [
+    bench['RitterAklToussaint']['result'][1],
+    bench['Ritter']['result'][1]
+]).show()

@@ -1,6 +1,6 @@
+import csv
 import numpy as np
 from abc import ABC, abstractmethod
-from pandas import DataFrame
 from typing import List
 from math import sqrt
 import matplotlib.pyplot as plt
@@ -22,13 +22,13 @@ def in_ABC(P, A, B, C):
     """Test if P is inside the triangle ABC.
 
     Not tested yet
-    
+
     Args:
         P (Point): The point to test
         A (Point): Point A of the triangle
         B (Point): Point B of the triangle
         C (Point): Point C of the triangle
-    
+
     Returns:
         bool: True if it is inside or else False
     """
@@ -53,6 +53,78 @@ class Point(object):
     def coords(self):
         return (self.x, self.y)
 
+
+class PointSet(list):
+    @staticmethod
+    def from_csv(file):
+        with open(file, newline='') as csvfile:
+            pointreader = csv.reader(csvfile, delimiter=' ', )
+            return PointSet([Point(int(row[0]), int(row[1])) for row in pointreader])
+
+    def x_col(self):
+        return [p.x for p in self]
+
+    def y_col(self):
+        return [p.y for p in self]
+
+def akl_toussaint(points: PointSet):
+    top = points[0]
+    bottom = top
+    left = top
+    right = top
+    # get initial values
+    for p in points:
+        if (p.x < left.x):
+            left = p
+        if (p.x > right.x):
+            right = p
+        if (p.y > top.y):
+            top = p
+        if (p.y < bottom.y):
+            bottom = p
+
+    rest = PointSet([top, bottom])
+    if left != top and left != bottom:
+        rest.append(left)
+    if right != top and right != bottom:
+        rest.append(right)
+
+    for p in points:
+
+        if (p == top):
+            continue
+        if (p == bottom):
+            continue
+        if (p == right):
+            continue
+        if (p == left):
+            continue
+
+        d = (top.x - left.x) * (p.y - left.y) - \
+            (top.y - left.y) * (p.x - left.x)
+        if d > 0:
+            rest.append(p)
+            continue
+
+        d = (right.x - top.x) * (p.y - top.y) - \
+            (right.y - top.y) * (p.x - top.x)
+        if d > 0:
+            rest.append(p)
+            continue
+
+        d = (bottom.x - right.x) * (p.y - right.y) - \
+            (bottom.y - right.y) * (p.x - right.x)
+        if d > 0:
+            rest.append(p)
+            continue
+
+        d = (left.x - bottom.x) * (p.y - bottom.y) - \
+            (left.y - bottom.y) * (p.x - bottom.x)
+        if d > 0:
+            rest.append(p)
+            continue
+
+    return rest
 
 class Area(ABC):
     """Class representing an area.
@@ -83,7 +155,7 @@ class Algorithm(ABC):
 
     Each subclass must implement these functions:
 
-        - def _execute(self, points: DataFrame) -> Area
+        - def _execute(self, points: PointSet) -> Area
     """
 
     def __init__(self):
@@ -91,11 +163,11 @@ class Algorithm(ABC):
         self.name = self.__class__.__name__
 
     @abstractmethod
-    def execute(self, points: DataFrame) -> Area:
+    def execute(self, points: PointSet) -> Area:
         """Run the algorithm and return the result and the duration.
 
         Args:
-            points (DataFrame): The points.
+            points (PointSet): The points.
 
         Returns:
             result (Area): The convex Hull.
@@ -103,29 +175,19 @@ class Algorithm(ABC):
         pass
 
 
-class AklToussaint(Algorithm):
-    def execute(self, points: DataFrame) -> Area:
-        # exemple iteration
-        for idx, x, y in points.itertuples():
-            # print(x)
-            # print(y)
-            pass
-        return Area()
-
-
 class Ritter(Algorithm):
-    def execute(self, points: DataFrame) -> Area:
+    def execute(self, points: PointSet) -> Area:
         """Ritter's bounding circle algorithm."""
-        dummy = points.iloc[0]
+        dummy = points[0]
         prev_dist = 0
-        for idx, point in points.iterrows():
+        for point in points[1:]:
             dist = square_dist(dummy, point)
             if prev_dist < dist:
                 prev_dist = dist
                 a = point
 
         prev_dist = 0
-        for idx, point in points.iterrows():
+        for point in points:
             dist = square_dist(a, point)
             if prev_dist < dist:
                 prev_dist = dist
@@ -134,7 +196,7 @@ class Ritter(Algorithm):
         rsq = prev_dist / 4
         r = sqrt(rsq)
 
-        for idx, p in points.iterrows():
+        for p in points:
             dx = p.x - c.x
             dy = p.y - c.y
             dsq = dx * dx + dy * dy
@@ -145,3 +207,7 @@ class Ritter(Algorithm):
                 c = Point(p.x - dx * factor, p.y - dy * factor)
                 rsq = r * r
         return Circle(c, r)
+
+class RitterAklToussaint(Ritter):
+    def execute(self, points: PointSet) -> Area:
+        return super().execute(akl_toussaint(points))

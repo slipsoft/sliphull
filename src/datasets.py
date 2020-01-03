@@ -1,10 +1,9 @@
 import wget
 import zipfile
 import ssl
-import pandas as pd
 import matplotlib.pyplot as plt
 import os
-from algorithms import Algorithm
+from algorithms import Algorithm, PointSet
 from glob import glob
 from time import time
 from collections import defaultdict
@@ -12,6 +11,7 @@ from typing import List, Dict
 
 #: Index of the last file after cleaning
 NB_FILES = 1663
+
 
 def download() -> bool:
     """Download the dataset from internet if it doesn't exist.
@@ -32,13 +32,16 @@ def download() -> bool:
     _clean_files()
     return True
 
+
 def _clean_files() -> None:
     """Well ok it's quite dirty, but the first file is corrupted
     and it is easier to start counting from 0.
     """
     try:
-        os.rename('samples/test-%s.points' % (NB_FILES + 1), 'samples/test-0.points')
-        os.rename('samples/test-%s.points' % (NB_FILES), 'samples/test-1.points')
+        os.rename('samples/test-%s.points' %
+                  (NB_FILES + 1), 'samples/test-0.points')
+        os.rename('samples/test-%s.points' %
+                  (NB_FILES), 'samples/test-1.points')
     except FileNotFoundError:
         pass
 
@@ -48,26 +51,26 @@ def all_files() -> List[str]:
     return glob('samples/*')
 
 
-def get_from_file(file: str) -> pd.DataFrame:
-    """Get a dataframe from a dataset file name."""
-    return pd.read_csv(file, sep=' ', names=['x', 'y'])
+def get_from_file(file: str) -> PointSet:
+    """Get a PointSet from a dataset file name."""
+    return PointSet.from_csv(file)
 
 
-def get(num: int) -> pd.DataFrame:
+def get(num: int) -> PointSet:
     """Get one of the datasets.
 
     Args:
         num (int): The number of the dataset to plot.
 
     Returns:
-        DataFrame: The points of this dataset.
+        PointSet: The points of this dataset.
 
     """
     file = 'samples/test-%s.points' % (num)
     return get_from_file(file)
 
 
-def plot(num: int, areas = []) -> None:
+def plot(num: int, areas=[]) -> plt:
     """Plot one of the datasets.
 
     Args:
@@ -75,22 +78,21 @@ def plot(num: int, areas = []) -> None:
 
     """
     points = get(num)
-    print(points)
 
     for area in areas:
         area.plot(plt)
 
     # plot the points as lines
-    plt.plot(points['x'], points['y'], 'r')
+    plt.plot(points.x_col(), points.y_col(), 'r')
 
     # plot the points as dots
-    plt.scatter(points['x'], points['y'], marker='+', zorder=3)
+    plt.scatter(points.x_col(), points.y_col(), marker='+', zorder=3)
 
     plt.axis('equal')
-    plt.show()
+    return plt
 
 
-def benchmark(algos: List[Algorithm], begin = 0, end = NB_FILES) -> Dict:
+def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES) -> Dict:
     """Make a benchmark of the given algorithms.
 
     Args:
