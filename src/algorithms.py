@@ -67,6 +67,7 @@ class PointSet(list):
     def y_col(self):
         return [p.y for p in self]
 
+
 def akl_toussaint(points: PointSet):
     top = points[0]
     bottom = top
@@ -124,7 +125,8 @@ def akl_toussaint(points: PointSet):
             rest.append(p)
             continue
 
-    return rest
+    return rest, Poly([top, right, bottom, left])
+
 
 class Area(ABC):
     """Class representing an area.
@@ -132,22 +134,45 @@ class Area(ABC):
     Not sure about how to store the list of points.
     """
 
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+
     @abstractmethod
-    def plot(self, plt: plt):
+    def plot(self, plt: plt, color='g'):
         pass
 
 
 class Circle(Area):
-    def __init__(self, center: Point, radius):
-        super().__init__()
+    def __init__(self, center: Point, radius, name=''):
+        super().__init__(name)
         self.center = center
         self.radius = radius
 
-    def plot(self, plt: plt):
+    def plot(self, plt: plt, color='g'):
         circle = plt.Circle(self.center.coords(),
-                            self.radius, color='g', fill=False)
+                            self.radius, color=color,
+                            fill=False)
         ax = plt.gca()
         ax.add_artist(circle)
+        return
+
+
+class Poly(Area):
+    def __init__(self, points, name=''):
+        super().__init__(name)
+        self.points = PointSet(points)
+
+    def plot(self, plt: plt, color='g'):
+        xs = self.points.x_col()
+        ys = self.points.y_col()
+
+        # append a copy of the first point to close the shape
+        xs.append(self.points[0].x)
+        ys.append(self.points[0].y)
+        plt.plot(xs, ys, color=color)
+
+        return
 
 
 class Algorithm(ABC):
@@ -206,8 +231,11 @@ class Ritter(Algorithm):
                 factor = r / dist
                 c = Point(p.x - dx * factor, p.y - dy * factor)
                 rsq = r * r
-        return Circle(c, r)
+        return Circle(c, r, self.name)
+
 
 class RitterAklToussaint(Ritter):
     def execute(self, points: PointSet) -> Area:
-        return super().execute(akl_toussaint(points))
+        points, area = akl_toussaint(points)
+        # return area
+        return super().execute(points)

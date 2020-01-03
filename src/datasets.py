@@ -2,7 +2,9 @@ import wget
 import zipfile
 import ssl
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import os
+from numpy.random import rand
 from algorithms import Algorithm, PointSet
 from glob import glob
 from time import time
@@ -79,11 +81,15 @@ def plot(num: int, areas=[]) -> plt:
     """
     points = get(num)
 
+    patches = []
     for area in areas:
-        area.plot(plt)
+        color = rand(3,)
+        area.plot(plt, color)
+        patches.append(mpatches.Patch(color=color, label=area.name))
+    plt.legend(handles=patches)
 
     # plot the points as lines
-    plt.plot(points.x_col(), points.y_col(), 'r')
+    #plt.plot(points.x_col(), points.y_col(), 'r')
 
     # plot the points as dots
     plt.scatter(points.x_col(), points.y_col(), marker='+', zorder=3)
