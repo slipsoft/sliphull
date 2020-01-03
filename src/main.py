@@ -9,6 +9,6 @@ algos = [
     AklToussaint(),
     # Ritter()
 ]
-print(datasets.benchmark(algos))
+print(datasets.benchmark(algos, 10, 15))
 
 datasets.plot(3)

@@ -10,6 +10,8 @@ from time import time
 from collections import defaultdict
 from typing import List, Dict
 
+#: Index of the last file after cleaning
+LAST_FILE = 1662
 
 def download() -> bool:
     """Download the dataset from internet if it doesn't exist.
@@ -35,8 +37,8 @@ def _clean_files() -> None:
     and it is easier to start counting from 0.
     """
     try:
-        os.rename('samples/test-1664.points', 'samples/test-0.points')
-        os.rename('samples/test-1663.points', 'samples/test-1.points')
+        os.rename('samples/test-%s.points' % (LAST_FILE + 2), 'samples/test-0.points')
+        os.rename('samples/test-%s.points' % (LAST_FILE + 1), 'samples/test-1.points')
     except FileNotFoundError:
         pass
 
@@ -46,7 +48,7 @@ def all_files() -> List[str]:
     return glob('samples/*')
 
 
-def get_from_file(file) -> pd.DataFrame:
+def get_from_file(file: str) -> pd.DataFrame:
     """Get a dataframe from a dataset file name."""
     return pd.read_csv(file, sep=' ', names=['x', 'y'])
 
@@ -61,7 +63,7 @@ def get(num: int) -> pd.DataFrame:
         DataFrame: The points of this dataset.
 
     """
-    file = 'samples/test-' + str(num) + '.points'
+    file = 'samples/test-%s.points' % (num)
     return get_from_file(file)
 
 
@@ -85,7 +87,7 @@ def plot(num: int) -> None:
     plt.show()
 
 
-def benchmark(algos: List[Algorithm]) -> Dict:
+def benchmark(algos: List[Algorithm], start = 0, length = LAST_FILE) -> Dict:
     """Make a benchmark of the given algorithms.
 
     Args:
@@ -99,7 +101,7 @@ def benchmark(algos: List[Algorithm]) -> Dict:
         'result': [],
         'duration': []
     })
-    for index, file in enumerate(all_files()):
+    for file in all_files()[start:length]:
         points = get_from_file(file)
         for algo in algos:
             start = time()
