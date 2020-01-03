@@ -40,10 +40,11 @@ class Area(ABC):
 
 
 class Circle(Area):
-    def __init__(self, center: Point, radius):
+    def __init__(self, center: Point, sq_radius):
         super().__init__()
         self.center = center
-        self.radius = radius
+        self.sq_radius = sq_radius
+        self.radius = sqrt(sq_radius)
 
     def plot(self, plt: plt):
         circle = plt.Circle(self.center.coords(),
@@ -91,17 +92,31 @@ class Ritter(Algorithm):
     def execute(self, points: DataFrame) -> Area:
         """Not finished but it's only the first implementation."""
         dummy = points.iloc[0]
-        prev_sq_dist = 0
+        prev_dist = 0
         for idx, point in points.iterrows():
-            sq_dist = square_dist(dummy, point)
-            if prev_sq_dist < sq_dist:
-                prev_sq_dist = sq_dist
+            dist = square_dist(dummy, point)
+            if prev_dist < dist:
+                prev_dist = dist
                 a = point
-        prev_sq_dist = 0
+
+        prev_dist = 0
         for idx, point in points.iterrows():
-            sq_dist = square_dist(a, point)
-            if prev_sq_dist < sq_dist:
-                prev_sq_dist = sq_dist
+            dist = square_dist(a, point)
+            if prev_dist < dist:
+                prev_dist = dist
                 b = point
-        center = middle(a, b)
-        return Circle(center, dist(center, b))
+        c = middle(a, b)
+        rsq = prev_dist / 4
+        r = sqrt(rsq)
+
+        for idx, p in points.iterrows():
+            dx = p.x - c.x
+            dy = p.y - c.y
+            dsq = dx * dx + dy * dy
+            if dsq > rsq:
+                dist = sqrt(dsq)
+                r = (r + dist) / 2
+                factor = r / dist
+                c = Point(p.x - dx * factor, p.y - dy * factor)
+                rsq = r * r
+        return Circle(c, rsq)
