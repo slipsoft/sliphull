@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import datasets
 import matplotlib.pyplot as plt
@@ -11,13 +11,9 @@ algos = [
     RitterAklToussaint(),
     Ritter()
 ]
-bench = datasets.benchmark(algos, 0, 20)
+bench = datasets.benchmark(algos, 0, 30)
 pprint(bench)
 
-datasets.plot(1, [
-    bench['RitterAklToussaint']['result'][1],
-    bench['Ritter']['result'][1],
-])
 datasets.plot(2, [
     bench['RitterAklToussaint']['result'][2],
     bench['Ritter']['result'][2],

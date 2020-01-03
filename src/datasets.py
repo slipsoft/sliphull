@@ -121,4 +121,14 @@ def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES) -> Dict:
             duration = time() - start
             results[algo.name]['result'].append(result)
             results[algo.name]['duration'].append(duration)
+
+    # Plot the duration comparision
+    fig, ax = plt.subplots()
+    ax.set_ylabel('Duration (s)')
+    ax.boxplot([results[algo]['duration'] for algo in results])
+    ax.set_xticklabels(results.keys())  # set ticks and labels on ax1 (otherwise it does not work)
+    ax.tick_params(axis='x', which='major', labelsize=7)  # reduce size of x labels
+
+    plt.title('Algorithm comparision (%d executions)' % (end - begin))
+    plt.tight_layout()
     return results

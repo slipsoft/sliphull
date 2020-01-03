@@ -8,6 +8,9 @@ Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 | Ritter's bounding circle     | ![bounding circle ritter](docs/bounding-circle-ritter.png)      |
 | Akl-Toussaint filter         | ![akl toussaint filter](docs/akl-toussaint-filter.png)          |
 
+**Duration**  
+![duration comparision](docs/comparision-duration.png)
+
 ## Getting started
 
 ### Activate environment
