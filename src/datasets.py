@@ -124,7 +124,16 @@ def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES) -> Dict:
     ax.boxplot([results[algo]['duration'] for algo in results])
     ax.set_xticklabels(results.keys())  # set ticks and labels on ax1 (otherwise it does not work)
     ax.tick_params(axis='x', which='major', labelsize=7)  # reduce size of x labels
-
     plt.title('Algorithm comparision (%d executions)' % (end - begin))
     plt.tight_layout()
+
+    # Plot the area comparision
+    fig, ax = plt.subplots()
+    ax.set_ylabel('Area')
+    ax.boxplot([[r.area() for r in results[algo]['result']] for algo in results])
+    ax.set_xticklabels(results.keys())  # set ticks and labels on ax1 (otherwise it does not work)
+    ax.tick_params(axis='x', which='major', labelsize=7)  # reduce size of x labels
+    plt.title('Algorithm comparision (%d executions)' % (end - begin))
+    plt.tight_layout()
+
     return results

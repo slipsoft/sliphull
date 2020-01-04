@@ -2,7 +2,7 @@ import csv
 import numpy as np
 from abc import ABC, abstractmethod
 from typing import List
-from math import sqrt
+from math import sqrt, pi
 import matplotlib.pyplot as plt
 
 
@@ -157,6 +157,10 @@ class Area(ABC):
     def plot(self, plt: plt, color='g'):
         pass
 
+    @abstractmethod
+    def area(self):
+        pass
+
 
 class Circle(Area):
     def __init__(self, center: Point, radius, name=''):
@@ -171,6 +175,9 @@ class Circle(Area):
         ax = plt.gca()
         ax.add_artist(circle)
         return
+
+    def area(self):
+        return pi * self.radius ** 2
 
 
 class Poly(Area):
@@ -188,6 +195,11 @@ class Poly(Area):
         plt.plot(xs, ys, color=color)
 
         return
+
+    def area(self):
+        pts = self.points.to_nparray()
+        lines = np.hstack([pts, np.roll(pts, -1, axis=0)])
+        return 0.5*abs(sum(x1*y2-x2*y1 for x1, y1, x2, y2 in lines))
 
 
 class Algorithm(ABC):
@@ -265,12 +277,16 @@ class AklToussaint(Algorithm):
         return area
 
 
-link = lambda a,b: np.concatenate((a,b[1:]))
-edge = lambda a,b: np.concatenate(([a],[b]))
+def link(a, b): return np.concatenate((a, b[1:]))
+
+
+def edge(a, b): return np.concatenate(([a], [b]))
+
 
 class QuickHull(Algorithm):
     def execute(self, points):
         sample = points.to_nparray()
+
         def dome(sample, base):
             h, t = base
             dists = np.dot(sample-h, np.dot(((0, -1), (1, 0)), (t-h)))
