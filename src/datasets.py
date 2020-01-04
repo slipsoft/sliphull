@@ -44,7 +44,7 @@ def _clean_files() -> None:
         os.rename('samples/test-%s.points' %
                   (NB_FILES + 1), 'samples/test-0.points')
         os.replace('samples/test-%s.points' %
-                  (NB_FILES), 'samples/test-1.points')
+                   (NB_FILES), 'samples/test-1.points')
     except FileNotFoundError:
         pass
 
@@ -68,15 +68,14 @@ def get(num: int) -> PointSet:
     return get_from_file(file)
 
 
-def plot(num: int, areas=[]) -> plt:
+def plot(points: PointSet, areas=[]) -> plt:
     """Plot one of the datasets.
 
     Args:
-        num (int): The number of the dataset to plot.
+        points (PointSet): The points of the dataset to plot.
+        areas (List[Area]): An array of Area objects to plot.
 
     """
-    points = get(num)
-
     plt.figure()
     patches = []
     for area in areas:
@@ -95,11 +94,14 @@ def plot(num: int, areas=[]) -> plt:
     return plt
 
 
-def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES) -> Dict:
+def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES, step=1) -> Dict:
     """Make a benchmark of the given algorithms.
 
     Args:
         algos (List[Algorithm]): The algorithms to benchmark.
+        begin (int): Index of the first dataset to use.
+        end (int): Index of the last dataset to use.
+        step (int): Number of files to combine.
 
     Returns:
         Dict: The results of the benchmark
@@ -109,31 +111,45 @@ def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES) -> Dict:
         'result': [],
         'duration': []
     })
-    for file in ALL_FILES[begin:end]:
-        points = get_from_file(file)
-        for algo in algos:
-            start = time()
-            result = algo.execute(points)
-            duration = time() - start
-            results[algo.name]['result'].append(result)
-            results[algo.name]['duration'].append(duration)
+    data = []
+    for idx, file in enumerate(ALL_FILES[begin:end]):
+        modulo = idx % step
+        if modulo == 0:
+            points = get_from_file(file)
+        elif modulo != step - 1:
+            points += get_from_file(file)
+        else:
+            data.append(points)
+            for algo in algos:
+                start = time()
+                result = algo.execute(points)
+                duration = time() - start
+                results[algo.name]['result'].append(result)
+                results[algo.name]['duration'].append(duration)
 
     # Plot the duration comparision
     fig, ax = plt.subplots()
     ax.set_ylabel('Duration (s)')
     ax.boxplot([results[algo]['duration'] for algo in results])
-    ax.set_xticklabels(results.keys())  # set ticks and labels on ax1 (otherwise it does not work)
-    ax.tick_params(axis='x', which='major', labelsize=7)  # reduce size of x labels
-    plt.title('Algorithm comparision (%d executions)' % (end - begin))
+    # set ticks and labels on ax (otherwise it does not work)
+    ax.set_xticklabels(results.keys())
+    # reduce size of x labels
+    ax.tick_params(axis='x', which='major', labelsize=7)
+    plt.title('Algorithm comparision (%d executions | %d points)' %
+              ((end - begin) / step, len(data[0])))
     plt.tight_layout()
 
     # Plot the area comparision
     fig, ax = plt.subplots()
     ax.set_ylabel('Area')
-    ax.boxplot([[r.area() for r in results[algo]['result']] for algo in results])
-    ax.set_xticklabels(results.keys())  # set ticks and labels on ax1 (otherwise it does not work)
-    ax.tick_params(axis='x', which='major', labelsize=7)  # reduce size of x labels
-    plt.title('Algorithm comparision (%d executions)' % (end - begin))
+    ax.boxplot([[r.area() for r in results[algo]['result']]
+                for algo in results])
+    # set ticks and labels on ax (otherwise it does not work)
+    ax.set_xticklabels(results.keys())
+    # reduce size of x labels
+    ax.tick_params(axis='x', which='major', labelsize=7)
+    plt.title('Algorithm comparision (%d executions | %d points)' %
+              ((end - begin) / step, len(data[0])))
     plt.tight_layout()
 
-    return results
+    return results, data

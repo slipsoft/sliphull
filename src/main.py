@@ -11,15 +11,17 @@ algos = [
     RitterAklToussaint(),
     Ritter(),
     QuickHull(),
+    QuickHullAklToussaint(),
 ]
 
-bench = datasets.benchmark(algos, 0, 30)
+bench, data = datasets.benchmark(algos, end=500, step=10)
 pprint(bench)
 
-datasets.plot(2, [
+datasets.plot(data[2], [
     bench['RitterAklToussaint']['result'][2],
     bench['Ritter']['result'][2],
     bench['QuickHull']['result'][2],
+    bench['QuickHullAklToussaint']['result'][2],
 ])
 
 AklToussaint().execute(datasets.get(2))

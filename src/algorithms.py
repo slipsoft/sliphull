@@ -303,3 +303,9 @@ class QuickHull(Algorithm):
             return Poly(PointSet.from_nparray(link(dome(sample, base), dome(sample, base[::-1]))), self.name)
         else:
             return Poly(points, self.name)
+
+
+class QuickHullAklToussaint(QuickHull):
+    def execute(self, points: PointSet) -> Area:
+        points, area = akl_toussaint(points)
+        return super().execute(points)
