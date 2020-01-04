@@ -2,15 +2,11 @@
 
 Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 
-| Algorithm                    | Hull                                                            |
-|------------------------------|-----------------------------------------------------------------|
-| Minimal circle approximation | ![minimal circle approximation](docs/minimal-circle-approx.png) |
-| Ritter's bounding circle     | ![bounding circle ritter](docs/bounding-circle-ritter.png)      |
-| Akl-Toussaint filter         | ![akl toussaint filter](docs/akl-toussaint-filter.png)          |
-| Combined                     | ![combined](docs/combined-hulls.png)                            |
+![combined](docs/combined-hulls.png)
+![akl toussaint filter](docs/akl-toussaint-filter.png)
 
-**Duration**  
-![duration comparision](docs/comparision-duration.png)
+**Performances**  
+![comparision](docs/comparision.png)
 
 ## Getting started
 

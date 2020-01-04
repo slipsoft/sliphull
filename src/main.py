@@ -14,14 +14,15 @@ algos = [
     QuickHullAklToussaint(),
 ]
 
-bench, data = datasets.benchmark(algos, end=500, step=10)
+bench, data = datasets.benchmark(algos, end=100, step=3)
 pprint(bench)
 
-datasets.plot(data[2], [
-    bench['RitterAklToussaint']['result'][2],
-    bench['Ritter']['result'][2],
-    bench['QuickHull']['result'][2],
-    bench['QuickHullAklToussaint']['result'][2],
+num = 0
+datasets.plot(data[num], [
+    # bench['RitterAklToussaint']['result'][num],
+    bench['Ritter']['result'][num],
+    bench['QuickHull']['result'][num],
+    # bench['QuickHullAklToussaint']['result'][num],
 ])
 
 AklToussaint().execute(datasets.get(2))

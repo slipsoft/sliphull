@@ -270,6 +270,9 @@ class RitterAklToussaint(Ritter):
 class AklToussaint(Algorithm):
     def execute(self, points: PointSet) -> Area:
         plt.figure()
+        plt.title('Akl-Toussaint filter')
+        plt.axis('equal')
+        plt.tight_layout()
         points.plot(plt)
         points, area = akl_toussaint(points)
         points.plot(plt, 'r')

@@ -4,8 +4,8 @@ import ssl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import os
-from numpy.random import rand
-from algorithms import Algorithm, PointSet
+import numpy as np
+from algorithms import Algorithm, PointSet, QuickHull
 from glob import glob
 from time import time
 from collections import defaultdict
@@ -79,7 +79,7 @@ def plot(points: PointSet, areas=[]) -> plt:
     plt.figure()
     patches = []
     for area in areas:
-        color = rand(3,)
+        color = np.random.rand(3,)
         area.plot(plt, color)
         patches.append(mpatches.Patch(color=color, label=area.name))
     plt.legend(handles=patches)
@@ -90,7 +90,9 @@ def plot(points: PointSet, areas=[]) -> plt:
     # plot the points as dots
     points.plot(plt)
 
+    plt.title('Algorithm comparision (%d points)' % len(points))
     plt.axis('equal')
+    plt.tight_layout()
     return plt
 
 
@@ -109,45 +111,40 @@ def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES, step=1) -> Dict:
     """
     results = defaultdict(lambda: {
         'result': [],
-        'duration': []
+        'duration': [],
+        'quality': [],
     })
     data = []
     for idx, file in enumerate(ALL_FILES[begin:end]):
         modulo = idx % step
         if modulo == 0:
             points = get_from_file(file)
-        elif modulo != step - 1:
-            points += get_from_file(file)
         else:
+            points += get_from_file(file)
+        if modulo == step - 1:
             data.append(points)
+            area = QuickHull().execute(points).area()
             for algo in algos:
                 start = time()
                 result = algo.execute(points)
                 duration = time() - start
                 results[algo.name]['result'].append(result)
                 results[algo.name]['duration'].append(duration)
+                results[algo.name]['quality'].append(result.area()/area - 1)
 
     # Plot the duration comparision
-    fig, ax = plt.subplots()
-    ax.set_ylabel('Duration (s)')
-    ax.boxplot([results[algo]['duration'] for algo in results])
+    fig, ax1 = plt.subplots()
+    ax1.set_ylabel('Quality (Lower is best)')
+    ax1.bar(range(1, len(algos) + 1),
+            [np.mean(results[algo]['quality']) for algo in results],
+            0.3)
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Duration (s)')
+    ax2.boxplot([results[algo]['duration'] for algo in results])
     # set ticks and labels on ax (otherwise it does not work)
-    ax.set_xticklabels(results.keys())
+    ax2.set_xticklabels(results.keys())
     # reduce size of x labels
-    ax.tick_params(axis='x', which='major', labelsize=7)
-    plt.title('Algorithm comparision (%d executions | %d points)' %
-              ((end - begin) / step, len(data[0])))
-    plt.tight_layout()
-
-    # Plot the area comparision
-    fig, ax = plt.subplots()
-    ax.set_ylabel('Area')
-    ax.boxplot([[r.area() for r in results[algo]['result']]
-                for algo in results])
-    # set ticks and labels on ax (otherwise it does not work)
-    ax.set_xticklabels(results.keys())
-    # reduce size of x labels
-    ax.tick_params(axis='x', which='major', labelsize=7)
+    ax2.tick_params(axis='x', which='major', labelsize=7)
     plt.title('Algorithm comparision (%d executions | %d points)' %
               ((end - begin) / step, len(data[0])))
     plt.tight_layout()
