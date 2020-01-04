@@ -1,4 +1,4 @@
-# SlipHull
+# ![SlipHull](docs/sliphull.png)
 
 Subject: <https://www-apr.lip6.fr/~buixuan/files/algav2019/projet_indiv2.pdf>
 
