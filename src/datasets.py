@@ -13,6 +13,7 @@ from typing import List, Dict
 
 #: Index of the last file after cleaning
 NB_FILES = 1663
+ALL_FILES = ['samples/test-%s.points' % i for i in range(NB_FILES)]
 
 
 def download() -> bool:
@@ -22,7 +23,7 @@ def download() -> bool:
         bool: True if it had to be downloaded.
 
     """
-    if os.path.isdir('samples') and len(all_files()) > 0:
+    if os.path.isdir('samples') and len(ALL_FILES) > 0:
         _clean_files()
         return False
     url = 'http://www-apr.lip6.fr/~buixuan/files/algav2019/Varoumas_benchmark.zip'
@@ -46,11 +47,6 @@ def _clean_files() -> None:
                   (NB_FILES), 'samples/test-1.points')
     except FileNotFoundError:
         pass
-
-
-def all_files() -> List[str]:
-    """Get all dataset file names."""
-    return glob('samples/*')
 
 
 def get_from_file(file: str) -> PointSet:
@@ -113,7 +109,7 @@ def benchmark(algos: List[Algorithm], begin=0, end=NB_FILES) -> Dict:
         'result': [],
         'duration': []
     })
-    for file in all_files()[begin:end]:
+    for file in ALL_FILES[begin:end]:
         points = get_from_file(file)
         for algo in algos:
             start = time()

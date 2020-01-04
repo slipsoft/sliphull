@@ -53,6 +53,9 @@ class Point(object):
     def coords(self):
         return (self.x, self.y)
 
+    def to_nparray(self):
+        return np.array([self.x, self.y])
+
 
 class PointSet(list):
     @staticmethod
@@ -60,6 +63,10 @@ class PointSet(list):
         with open(file, newline='') as csvfile:
             pointreader = csv.reader(csvfile, delimiter=' ', )
             return PointSet([Point(int(row[0]), int(row[1])) for row in pointreader])
+
+    @staticmethod
+    def from_nparray(array):
+        return PointSet([Point(int(row[0]), int(row[1])) for row in array])
 
     def x_col(self):
         return [p.x for p in self]
@@ -71,6 +78,9 @@ class PointSet(list):
         # plot the points as dots
         plt.scatter(self.x_col(), self.y_col(),
                     marker='+', zorder=3, color=color)
+
+    def to_nparray(self):
+        return np.array([p.to_nparray() for p in self])
 
 
 def akl_toussaint(points: PointSet):
@@ -130,7 +140,7 @@ def akl_toussaint(points: PointSet):
             rest.append(p)
             continue
 
-    return rest, Poly([top, right, bottom, left])
+    return rest, Poly(PointSet([top, right, bottom, left]))
 
 
 class Area(ABC):
@@ -164,9 +174,9 @@ class Circle(Area):
 
 
 class Poly(Area):
-    def __init__(self, points, name=''):
+    def __init__(self, points: PointSet, name=''):
         super().__init__(name)
-        self.points = PointSet(points)
+        self.points = points
 
     def plot(self, plt: plt, color='g'):
         xs = self.points.x_col()
@@ -253,3 +263,27 @@ class AklToussaint(Algorithm):
         points.plot(plt, 'r')
         area.plot(plt)
         return area
+
+
+link = lambda a,b: np.concatenate((a,b[1:]))
+edge = lambda a,b: np.concatenate(([a],[b]))
+
+class QuickHull(Algorithm):
+    def execute(self, points):
+        sample = points.to_nparray()
+        def dome(sample, base):
+            h, t = base
+            dists = np.dot(sample-h, np.dot(((0, -1), (1, 0)), (t-h)))
+            outer = np.repeat(sample, dists > 0, 0)
+            if len(outer):
+                pivot = sample[np.argmax(dists)]
+                return link(dome(outer, edge(h, pivot)),
+                            dome(outer, edge(pivot, t)))
+            else:
+                return base
+        if len(sample) > 2:
+            axis = sample[:, 0]
+            base = np.take(sample, [np.argmin(axis), np.argmax(axis)], 0)
+            return Poly(PointSet.from_nparray(link(dome(sample, base), dome(sample, base[::-1]))), self.name)
+        else:
+            return Poly(points, self.name)
